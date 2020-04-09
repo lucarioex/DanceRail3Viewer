@@ -1,7 +1,5 @@
 fileFormatVersion: 2
-guid: a7ecf8ad4234bea4abc02ac35ce62c97
-timeCreated: 1537112551
-licenseType: Free
+guid: 7fba61fba9758e042bdcf57f6e5b2adb
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -13,11 +11,13 @@ TrueTypeFontImporter:
   fontName: GenEi Gothic M
   fontNames:
   - GenEi Gothic M
-  fallbackFontReferences: []
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: a7ecf8ad4234bea4abc02ac35ce62c97, type: 3}
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1
   useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
   userData: 
   assetBundleName: 
   assetBundleVariant: 

@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: a7ecf8ad4234bea4abc02ac35ce62c97
+timeCreated: 1537112551
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: GenEi Gothic M
+  fontNames:
+  - GenEi Gothic M
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

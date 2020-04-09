@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4cb0676a7563e69419d6ec9b771c3973
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - sPF: {fileID: 21300000, guid: e5d20b6e450fad9429c53582e31962be, type: 3}
+  - sGD: {fileID: 21300000, guid: b72ac5c5ffed55b40be9459832189305, type: 3}
+  - sMS: {fileID: 21300000, guid: ec1507ec17c3bf846abf2f775941e310, type: 3}
+  - sFA: {fileID: 21300000, guid: ec4b29f7a390e304fa3db3e2ff36185d, type: 3}
+  - sSL: {fileID: 21300000, guid: 62bfa0acde9af2b4ab829f74d88e0664, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

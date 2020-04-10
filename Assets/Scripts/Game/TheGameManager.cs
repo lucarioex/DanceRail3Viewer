@@ -36,8 +36,6 @@ public class TheGameManager : MonoBehaviour
     [SerializeField]
     public float PJms = 30.0f, PFms = 60.0f, GDms = 100.0f;
 
-    [Header("--------------------")]
-
     float SCORE = 0;
     float MSCORE = 3000000;
     int COMBO = 0;
@@ -58,7 +56,7 @@ public class TheGameManager : MonoBehaviour
     }
 
     //維持オブジェクト
-    [SerializeField]
+    [SerializeField, Header("--------------------")]
     GameObject InputManager, OnpuPrefab, HanteiPrefab;
 
     [SerializeField]

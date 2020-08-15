@@ -19,13 +19,13 @@ public class TheGameManager : MonoBehaviour
     string SongTitle = "Blue Melody", SongArtist = "波導Lucario";
 
 
-    [SerializeField,Range(1,30)]
+    [SerializeField, Range(1, 30)]
     public int NoteSpeed = 12;
-    [SerializeField,Range(-200,200)]
+    [SerializeField, Range(-200, 200)]
     float NoteOffset = 0;
     [SerializeField]
     public bool GameAuto = true, GameMirror = false;
-    [SerializeField,Range(0,10)]
+    [SerializeField, Range(0, 10)]
     public int GameEffectGaterLevel = 8, GameEffectParamEQLevel = 8, GameEffectTap = 6;
 
     [SerializeField]
@@ -56,63 +56,64 @@ public class TheGameManager : MonoBehaviour
     }
 
     //維持オブジェクト
-    [SerializeField, Header("--------------------")]
+    [SerializeField, HideInInspector]
     GameObject InputManager, OnpuPrefab, HanteiPrefab;
 
-    [SerializeField]
+    [SerializeField, HideInInspector]
     Image ImageBackground;
     Vector3 backgroundStartPos;
 
-    [SerializeField]
+    [SerializeField, HideInInspector]
     InputManager inputManager;
 
     float ReadyTime = 1.99f;
     bool endFlag = false, bgameover = false;
 
-    [SerializeField] AudioSource BGMManager;
+    [SerializeField, HideInInspector] AudioSource BGMManager;
 
     AudioClip ac_hit, ac_flick, ac_gameover;
 
-    [SerializeField] HPManager hpManager;
-    [SerializeField] MeshDrawer meshDrawer;
-    [SerializeField] Sprite[] SpriteNotes;
-    [SerializeField] Sprite[] SpriteArror;
-    [SerializeField] GameObject[] prefabEffect;
-    [SerializeField] GameObject notesUp, notesDown;
+    [SerializeField, HideInInspector] HPManager hpManager;
+    [SerializeField, HideInInspector] MeshDrawer meshDrawer;
+    [SerializeField, HideInInspector] Sprite[] SpriteNotes;
+    [SerializeField, HideInInspector] Sprite[] SpriteArror;
+    [SerializeField, HideInInspector] GameObject[] prefabEffect;
+    [SerializeField, HideInInspector] GameObject notesUp, notesDown;
 
-    [SerializeField] Text textSongTitle, textSongArtist, textDif;
-    [SerializeField] Image sprSongImage;
-    [SerializeField] Slider sliderMusicTime;
+    [SerializeField, HideInInspector] Text textSongTitle, textSongArtist, textDif;
+    [SerializeField, HideInInspector] Image sprSongImage;
+    [SerializeField, HideInInspector] Slider sliderMusicTime;
 
-    [SerializeField] Text textScore, textMaxcombo, textPerfect, textPerfect2, textGood, textMiss;
-    [SerializeField] GameObject[] objCombo;
-    [SerializeField] Image[] imgHanteiBeam;
-    [SerializeField] Animator animSC;
+    [SerializeField, HideInInspector] Text textScore, textMaxcombo, textPerfect, textPerfect2, textGood, textMiss;
+    [SerializeField, HideInInspector] GameObject[] objCombo;
+    [SerializeField, HideInInspector] Image[] imgHanteiBeam;
+    [SerializeField, HideInInspector] Animator animSC;
 
-    [SerializeField] AnimationCurve EQCurve;
+    [SerializeField, HideInInspector] AnimationCurve EQCurve;
     List<float> EQList = new List<float>();
     float AudioMixerFreq = 1.0f, AudioMixerCenter = 1.0f;
     List<float> AngList = new List<float>();
     float[] HgtList = new float[1000];
-    public AnimationCurve HeightCurve;
+    [HideInInspector] public AnimationCurve HeightCurve;
 
-    [SerializeField] GameObject TheCamera;
+    [SerializeField, HideInInspector] GameObject TheCamera;
 
-    [SerializeField] AudioMixer audioMixer;
+    [SerializeField, HideInInspector] AudioMixer audioMixer;
 
-    [SerializeField] Image HPMask;
-    [SerializeField] GameObject[] AnimationGrades;
+    [SerializeField, HideInInspector] Image HPMask;
+    [SerializeField, HideInInspector] GameObject[] AnimationGrades;
     float SkillDamage = 1.0f;
 
 
+    [HideInInspector]
     public AnimationCurve BPMCurve,   //ss to realtime s
                             SCCurve;    //realtime ms to drawtime
 
-    public double SHINDO = 0.0, DSHINDO = 0.0;
+    [HideInInspector] public double SHINDO = 0.0, DSHINDO = 0.0;
     int CurrentSCn = 0;
     float CurrentSC = 1.0f;
 
-    public bool isPause = false;
+    [HideInInspector] public bool isPause = false;
 
     public class DRBFile
     {
@@ -397,25 +398,25 @@ public class TheGameManager : MonoBehaviour
             if (drbfile.onpu[i].pos < 0)
             {
                 int s = (int)(drbfile.onpu[i].ms / 1000.0f);
-                HgtList[s + 0] = Mathf.Max(drbfile.onpu[i].pos / (-16.0f), HgtList[s + 0]);
-                HgtList[s + 1] = Mathf.Max(drbfile.onpu[i].pos / (-16.0f), HgtList[s + 1]);
+                if (s + 0 >= 0 && s + 0 < HgtList.Length) HgtList[s + 0] = Mathf.Max(drbfile.onpu[i].pos / (-16.0f), HgtList[s + 0]);
+                if (s + 1 >= 0 && s + 1 < HgtList.Length) HgtList[s + 1] = Mathf.Max(drbfile.onpu[i].pos / (-16.0f), HgtList[s + 1]);
 
                 if (drbfile.onpu[i].pos < -8)
                 {
-                    HgtList[s - 1] = Mathf.Max(drbfile.onpu[i].pos / (-32.0f), HgtList[s - 1]);
-                    HgtList[s + 2] = Mathf.Max(drbfile.onpu[i].pos / (-32.0f), HgtList[s + 2]);
+                    if (s - 1 >= 0 && s - 1 < HgtList.Length) HgtList[s - 1] = Mathf.Max(drbfile.onpu[i].pos / (-32.0f), HgtList[s - 1]);
+                    if (s + 2 >= 0 && s + 2 < HgtList.Length) HgtList[s + 2] = Mathf.Max(drbfile.onpu[i].pos / (-32.0f), HgtList[s + 2]);
                 }
             }
             if (drbfile.onpu[i].pos + drbfile.onpu[i].width > 16)
             {
                 int s = (int)(drbfile.onpu[i].ms / 1000.0f);
-                HgtList[s + 0] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 16.0f, HgtList[s + 0]);
-                HgtList[s + 1] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 16.0f, HgtList[s + 1]);
+                if (s + 0 >= 0 && s + 0 < HgtList.Length) HgtList[s + 0] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 16.0f, HgtList[s + 0]);
+                if (s + 1 >= 0 && s + 1 < HgtList.Length) HgtList[s + 1] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 16.0f, HgtList[s + 1]);
 
                 if (drbfile.onpu[i].pos > 24)
                 {
-                    HgtList[s - 1] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 32.0f, HgtList[s - 1]);
-                    HgtList[s + 2] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 32.0f, HgtList[s + 2]);
+                    if (s - 1 >= 0 && s - 1 < HgtList.Length) HgtList[s - 1] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 32.0f, HgtList[s - 1]);
+                    if (s + 2 >= 0 && s + 2 < HgtList.Length) HgtList[s + 2] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 32.0f, HgtList[s + 2]);
                 }
             }
         }

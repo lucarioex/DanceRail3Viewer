@@ -173,8 +173,22 @@ public class TheGameManager : MonoBehaviour
         SCORE_INIT();
 
         //曲データ表示
-        if (textSongTitle) textSongTitle.text = SongTitle;
-        if (textSongArtist) textSongArtist.text = SongArtist;
+        if (textSongTitle)
+        {
+            textSongTitle.text = SongTitle;
+            if (textSongTitle.preferredWidth > 320.0f)
+            {
+                textSongTitle.rectTransform.localScale = new Vector2(320.0f / textSongTitle.preferredWidth, 1.0f);
+            }
+        }
+        if (textSongArtist)
+        {
+            textSongArtist.text = SongArtist;
+            if (textSongArtist.preferredWidth > 320.0f)
+            {
+                textSongArtist.rectTransform.localScale = new Vector2(320.0f / textSongArtist.preferredWidth, 1.0f);
+            }
+        }
         if (textDif)
         {
             textDif.text = "Tier " + SongHard;

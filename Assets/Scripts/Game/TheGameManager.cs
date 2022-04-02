@@ -67,7 +67,6 @@ public class TheGameManager : MonoBehaviour
     InputManager inputManager;
 
     float ReadyTime = 1.99f;
-    bool endFlag = false, bgameover = false;
 
     [SerializeField, HideInInspector] AudioSource BGMManager;
 
@@ -90,11 +89,16 @@ public class TheGameManager : MonoBehaviour
     [SerializeField, HideInInspector] Animator animSC;
 
     [SerializeField, HideInInspector] AnimationCurve EQCurve;
-    List<float> EQList = new List<float>();
-    float AudioMixerFreq = 1.0f, AudioMixerCenter = 1.0f;
+    List<float>
+        EQList = new List<float>(),
+        HPList = new List<float>(),
+        LPList = new List<float>();
+    float AudioMixerFreq = 1.0f, AudioMixerCenter = 1.0f,
+        AudioMixerHiPass = 20.0f, AudioMixerLoPass = 10000.0f;
     List<float> AngList = new List<float>();
     float[] HgtList = new float[1000];
     [HideInInspector] public AnimationCurve HeightCurve;
+    public AnimationCurve PositionCurve;
 
     [SerializeField, HideInInspector] GameObject TheCamera;
 
@@ -122,7 +126,7 @@ public class TheGameManager : MonoBehaviour
         public float beat;
         public List<BPMS> bpms;
         public List<SCNS> scns;
-        public List<TheOnpu> onpu;
+        public List<TheOnpu.OnpuData> onpu;
         public int onpuWeightCount;
     }
     public class BPMS
@@ -142,9 +146,9 @@ public class TheGameManager : MonoBehaviour
     List<bool> isCreated = new List<bool>();
     int makenotestart = 0;
 
-    int[] OnpuWeight = new int[20]
+    int[] OnpuWeight = new int[28]
     {
-        1,3,3,1,1,1,1,1,2,2,3,1,1,2,2,2,2,3,3,3
+        1,3,3,1,1,1,1,1,2,2,3,1,1,2,2,2,2,3,3,2,2,2,2,2,2,2,2,2
     };
 
     // Use this for initialization
@@ -183,7 +187,7 @@ public class TheGameManager : MonoBehaviour
         drbfile = new DRBFile();
         drbfile.bpms = new List<BPMS>();
         drbfile.scns = new List<SCNS>();
-        drbfile.onpu = new List<TheOnpu>();
+        drbfile.onpu = new List<TheOnpu.OnpuData>();
         SonglistReadin();
 
         //簡単整理
@@ -392,31 +396,52 @@ public class TheGameManager : MonoBehaviour
         }
 
 
-        //カメラ高さ調整
+        //横移動カーブ
+        List<Keyframe> kfpos = new List<Keyframe>();
+        kfpos.Add(new Keyframe(0, 0));
+        float currentp = 0.0f;
         for (int i = 0; i < drbfile.onpu.Count; i++)
         {
-            if (drbfile.onpu[i].pos < 0)
+            if (drbfile.onpu[i].kind == 23 || drbfile.onpu[i].kind == 24)
             {
-                int s = (int)(drbfile.onpu[i].ms / 1000.0f);
-                if (s + 0 >= 0 && s + 0 < HgtList.Length) HgtList[s + 0] = Mathf.Max(drbfile.onpu[i].pos / (-16.0f), HgtList[s + 0]);
-                if (s + 1 >= 0 && s + 1 < HgtList.Length) HgtList[s + 1] = Mathf.Max(drbfile.onpu[i].pos / (-16.0f), HgtList[s + 1]);
-
-                if (drbfile.onpu[i].pos < -8)
-                {
-                    if (s - 1 >= 0 && s - 1 < HgtList.Length) HgtList[s - 1] = Mathf.Max(drbfile.onpu[i].pos / (-32.0f), HgtList[s - 1]);
-                    if (s + 2 >= 0 && s + 2 < HgtList.Length) HgtList[s + 2] = Mathf.Max(drbfile.onpu[i].pos / (-32.0f), HgtList[s + 2]);
-                }
+                if (!kfpos.Exists(k => k.time == drbfile.onpu[i].parent_ms / 1000.0f))
+                    kfpos.Add(new Keyframe(drbfile.onpu[i].parent_ms / 1000.0f, currentp));
+                currentp += (drbfile.onpu[i].pos + drbfile.onpu[i].width * 0.5f) - (drbfile.onpu[i].parent_pos + drbfile.onpu[i].parent_width * 0.5f);
+                kfpos.Add(new Keyframe(drbfile.onpu[i].ms / 1000.0f, currentp));
             }
-            if (drbfile.onpu[i].pos + drbfile.onpu[i].width > 16)
-            {
-                int s = (int)(drbfile.onpu[i].ms / 1000.0f);
-                if (s + 0 >= 0 && s + 0 < HgtList.Length) HgtList[s + 0] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 16.0f, HgtList[s + 0]);
-                if (s + 1 >= 0 && s + 1 < HgtList.Length) HgtList[s + 1] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 16.0f, HgtList[s + 1]);
+        }
+        Keyframe[] kfposa = kfpos.ToArray();
+        LinearKeyframe(kfposa);
+        PositionCurve = new AnimationCurve(kfposa);
 
-                if (drbfile.onpu[i].pos > 24)
+        if (kfpos.Count <= 1)
+        {
+            //カメラ高さ調整
+            for (int i = 0; i < drbfile.onpu.Count; i++)
+            {
+                if (drbfile.onpu[i].pos < 0)
                 {
-                    if (s - 1 >= 0 && s - 1 < HgtList.Length) HgtList[s - 1] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 32.0f, HgtList[s - 1]);
-                    if (s + 2 >= 0 && s + 2 < HgtList.Length) HgtList[s + 2] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 32.0f, HgtList[s + 2]);
+                    int s = (int)(drbfile.onpu[i].ms / 1000.0f);
+                    if (s + 0 >= 0 && s + 0 < HgtList.Length) HgtList[s + 0] = Mathf.Max(drbfile.onpu[i].pos / (-16.0f), HgtList[s + 0]);
+                    if (s + 1 >= 0 && s + 1 < HgtList.Length) HgtList[s + 1] = Mathf.Max(drbfile.onpu[i].pos / (-16.0f), HgtList[s + 1]);
+
+                    if (drbfile.onpu[i].pos < -8)
+                    {
+                        if (s - 1 >= 0 && s - 1 < HgtList.Length) HgtList[s - 1] = Mathf.Max(drbfile.onpu[i].pos / (-32.0f), HgtList[s - 1]);
+                        if (s + 2 >= 0 && s + 2 < HgtList.Length) HgtList[s + 2] = Mathf.Max(drbfile.onpu[i].pos / (-32.0f), HgtList[s + 2]);
+                    }
+                }
+                if (drbfile.onpu[i].pos + drbfile.onpu[i].width > 16)
+                {
+                    int s = (int)(drbfile.onpu[i].ms / 1000.0f);
+                    if (s + 0 >= 0 && s + 0 < HgtList.Length) HgtList[s + 0] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 16.0f, HgtList[s + 0]);
+                    if (s + 1 >= 0 && s + 1 < HgtList.Length) HgtList[s + 1] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 16.0f, HgtList[s + 1]);
+
+                    if (drbfile.onpu[i].pos > 24)
+                    {
+                        if (s - 1 >= 0 && s - 1 < HgtList.Length) HgtList[s - 1] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 32.0f, HgtList[s - 1]);
+                        if (s + 2 >= 0 && s + 2 < HgtList.Length) HgtList[s + 2] = Mathf.Max((drbfile.onpu[i].pos + drbfile.onpu[i].width - 16.0f) / 32.0f, HgtList[s + 2]);
+                    }
                 }
             }
         }
@@ -609,7 +634,7 @@ public class TheGameManager : MonoBehaviour
                 //Notesデータ取得
                 string ss = s[i].Replace("<", "");
                 string[] sss = ss.Substring(0, ss.Length - 2).Split('>');
-                TheOnpu onpu = new TheOnpu();
+                TheOnpu.OnpuData onpu = new TheOnpu.OnpuData();
                 onpu.id = int.Parse(sss[0]);
                 onpu.kind = int.Parse(sss[1]);
                 if (onpu.kind == 12) onpu.kind = 6;
@@ -675,10 +700,34 @@ public class TheGameManager : MonoBehaviour
                     AudioMixerFreq -= (AudioMixerFreq - (1.0f + 0.15f * GameEffectParamEQLevel)) * 20.0f * Time.deltaTime;
                     AudioMixerCenter -= (AudioMixerCenter - adv) * 20.0f * Time.deltaTime;
                 }
+
+                //High Pass
+                if (HPList.Count <= 0)
+                {
+                    AudioMixerHiPass = 0.0f;
+                }
+                else
+                {
+                    AudioMixerHiPass = HPList.Average();
+                }
+
+                //Low Pass
+                if (LPList.Count <= 0)
+                {
+                    AudioMixerLoPass = 1.0f;
+                }
+                else
+                {
+                    AudioMixerLoPass = LPList.Average();
+                }
                 audioMixer.SetFloat("Center", EQCurve.Evaluate(AudioMixerCenter));
                 audioMixer.SetFloat("Freq", AudioMixerFreq);
+                audioMixer.SetFloat("HPFreq", EQCurve.Evaluate(AudioMixerHiPass));
+                audioMixer.SetFloat("LPFreq", EQCurve.Evaluate(AudioMixerLoPass));
 
                 EQList.Clear();
+                HPList.Clear();
+                LPList.Clear();
             }
 
             //斜め　AngList
@@ -705,6 +754,7 @@ public class TheGameManager : MonoBehaviour
             var pos = TheCamera.transform.position;
             pos.y -= (pos.y - (9.0f + 18.0f * HeightCurve.Evaluate(BGMManager.time))) * 20.0f * Time.deltaTime;
             pos.z -= (pos.z - (-7.0f - 14.0f * HeightCurve.Evaluate(BGMManager.time))) * 20.0f * Time.deltaTime;
+            pos.x -= (pos.x - PositionCurve.Evaluate(BGMManager.time)) * 30.0f * Time.deltaTime;
             TheCamera.transform.position = pos;
 
             //HPMask描画
@@ -858,7 +908,7 @@ public class TheGameManager : MonoBehaviour
 
     public void StartGameOverEvent()
     {
-        bgameover = true;
+        //bgameover = true;
         StartCoroutine(GameOverEvent());
     }
 
@@ -905,6 +955,12 @@ public class TheGameManager : MonoBehaviour
         if (k == 12) return true;
         if (k == 17) return true;
         if (k == 18) return true;
+        if (k == 19) return true;
+        if (k == 20) return true;
+        if (k == 21) return true;
+        if (k == 22) return true;
+        if (k == 23) return true;
+        if (k == 24) return true;
 
         return false;
     }
@@ -918,6 +974,9 @@ public class TheGameManager : MonoBehaviour
         if (k == 7) return true;
         if (k == 10) return true;
         if (k == 18) return true;
+        if (k == 20) return true;
+        if (k == 22) return true;
+        if (k == 24) return true;
 
         return false;
     }
@@ -953,7 +1012,7 @@ public class TheGameManager : MonoBehaviour
 
         return true;
     }
-    bool isCovering(TheOnpu o1, TheOnpu o2)
+    bool isCovering(TheOnpu.OnpuData o1, TheOnpu.OnpuData o2)
     {
         float l1, w1, l2, w2;
         /*l1 = o1.pos;
@@ -1194,6 +1253,14 @@ public class TheGameManager : MonoBehaviour
     {
         EQList.Add(f);
     }
+    public void AddHP(float f)
+    {
+        HPList.Add(f);
+    }
+    public void AddLP(float f)
+    {
+        LPList.Add(f);
+    }
     public void AddAng(float f)
     {
         AngList.Add(f);
@@ -1205,7 +1272,7 @@ public class TheGameManager : MonoBehaviour
         HPMask.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    Color[] TierColor = new Color[22]
+    Color[] TierColor = new Color[27]
     {
         new Color(1.0f,1.0f,1.0f),//0
         new Color(0.5f,0.5f,1.0f),
@@ -1227,8 +1294,13 @@ public class TheGameManager : MonoBehaviour
         new Color(1.0f,0.5f,1.0f),
         new Color(1.0f,0.5f,1.0f),
         new Color(1.0f,0.5f,1.0f),
-        new Color(1.0f,0.5f,1.0f),
-        new Color(1.0f,0.5f,1.0f)
+        new Color(1.0f,0.5f,1.0f),//20
+        new Color(0.1f,0.1f,0.1f),
+        new Color(0.1f,0.1f,0.1f),
+        new Color(0.1f,0.1f,0.1f),
+        new Color(0.1f,0.1f,0.1f),
+        new Color(0.1f,0.1f,0.1f),//25
+        new Color(0.1f,0.1f,0.1f)
     };
 
 }

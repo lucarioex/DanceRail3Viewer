@@ -28,6 +28,7 @@ Transform:
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 2, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4353226021722712}
   m_Father: {fileID: 0}
@@ -44,9 +45,12 @@ SpriteRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -97,14 +101,26 @@ MonoBehaviour:
   _material1: {fileID: 2100000, guid: 94b8d8f39001bb347baa975ba99845a3, type: 2}
   _material2: {fileID: 2100000, guid: 8a7cc439b7b4009439c9c388eee5ccd8, type: 2}
   _material3: {fileID: 2100000, guid: 566675f1461a0ef42b88ad9ce722a251, type: 2}
+  _material4: {fileID: 2100000, guid: 086e6b312fc623f4fada56caeef8ea7e, type: 2}
+  _material5: {fileID: 2100000, guid: fbef63082d3321d4382a72a8e5260bc5, type: 2}
+  _material6: {fileID: 2100000, guid: 6414ea49f33964b479bd7118627f6996, type: 2}
   mDrawer: {fileID: 0}
+  acNSC:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   id: 0
   kind: 0
   ichi: 0
   pos: 0
   width: 0
-  up: 0
+  nsc: 
+  isnadnsc: 0
+  insc: 0
   parent: 0
+  mode: n
   parent_ms: 0
   parent_dms: 0
   parent_pos: 0
@@ -144,6 +160,7 @@ Transform:
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: -0, z: -0.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4944979413894200}
   m_RootOrder: 0
@@ -159,9 +176,12 @@ SpriteRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
